@@ -10,6 +10,9 @@ import Grid from "@mui/material/Grid";
 import LockOutlinedIcon from "@mui/icons-material/RestoreFromTrashOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 function Copyright(props) {
   return (
@@ -32,23 +35,45 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function DonationForm() {
-  const handleSubmit = (event) => {
-    // FIELD:
-    // -Donation Amount (required)
-    // -Name (required)
-    // -Email (email format and required)
-    // -ID Number (NRIC validation and required)
-    // -Postal Code (6 digit format and required)
-    // -Unit Number (max length 6 with hypen symbol is a must and also required)
-    // -Address (optional, but when filled can’t only use digit)
-    // -Remarks (optional)
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    alert({
-      email: data.get("email"),
-      amount: data.get("amount"),
-    });
+  // FIELD:
+  // -Donation Amount (required)
+  // -Name (required)
+  // -Email (email format and required)
+  // -ID Number (NRIC validation and required)
+  // -Postal Code (6 digit format and required)
+  // -Unit Number (max length 6 with hypen symbol is a must and also required)
+  // -Address (optional, but when filled can’t only use digit)
+  // -Remarks (optional)
+  const schema = yup.object().shape({
+    email: yup.string().email().required(),
+    name: yup.string().min(2).max(128).required(),
+    amount: yup.number().required(),
+    nirc: yup.string().length(16).required(),
+    postal: yup.number().required(),
+    unit: yup.number().required(),
+    address: yup.string(),
+    remark: yup.string(),
+  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
+  const onSubmitHandler = (data) => {
+    alert({ data });
+    reset();
   };
+  // const handleSubmit = (event) => {
+  //   event.preventDefault();
+  //   const data = new FormData(event.currentTarget);
+  //   alert({
+  //     email: data.get("email"),
+  //     amount: data.get("amount"),
+  //   });
+  // };
 
   return (
     <ThemeProvider theme={theme}>
@@ -89,7 +114,7 @@ export default function DonationForm() {
             <Box
               component="form"
               noValidate
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit(onSubmitHandler)}
               sx={{ mt: 1 }}
             >
               <TextField
@@ -99,7 +124,11 @@ export default function DonationForm() {
                 id="amount"
                 label="Donation Amount"
                 name="amount"
+                {...register("amount")}
+                error={!!errors.amount}
+                helperText={errors.amount?.message}
                 type="number"
+                autoFocus
               />
               <TextField
                 margin="normal"
@@ -107,6 +136,9 @@ export default function DonationForm() {
                 fullWidth
                 id="name"
                 label="Full Name"
+                error={!!errors.name}
+                helperText={errors.name?.message}
+                {...register("name")}
                 name="name"
                 autoComplete="name"
               />
@@ -115,12 +147,14 @@ export default function DonationForm() {
                 required
                 fullWidth
                 id="email"
+                {...register("email")}
                 label="Email Address"
                 name="email"
                 autoComplete="email"
-                autoFocus
+                error={!!errors.email}
+                helperText={errors.email?.message}
               />
-              {/* <TextField
+              <TextField
                 margin="normal"
                 required
                 fullWidth
@@ -128,15 +162,22 @@ export default function DonationForm() {
                 label="ID Card Number"
                 name="nirc"
                 autoComplete="nirc"
+                {...register("nirc")}
+                error={!!errors.nirc}
+                helperText={errors.nirc?.message}
               />
               <TextField
                 margin="normal"
                 required
                 fullWidth
                 id="postal"
+                type="number"
                 label="Postal Code"
                 name="postal"
                 autoComplete="postal"
+                {...register("postal")}
+                error={!!errors.postal}
+                helperText={errors.postal?.message}
               />
               <TextField
                 margin="normal"
@@ -145,26 +186,34 @@ export default function DonationForm() {
                 id="unit"
                 label="Unit Number"
                 name="unit"
+                type="number"
                 autoComplete="unit"
+                {...register("unit")}
+                error={!!errors.unit}
+                helperText={errors.unit?.message}
               />
               <TextField
                 margin="normal"
-                required
                 fullWidth
                 id="address"
                 label="Address"
                 name="address"
                 autoComplete="address"
+                {...register("address")}
+                error={!!errors.address}
+                helperText={errors.address?.message}
               />
               <TextField
                 margin="normal"
-                required
                 fullWidth
                 id="remark"
                 label="Remarks"
                 name="remark"
                 autoComplete="remark"
-              /> */}
+                {...register("remark")}
+                error={!!errors.remark}
+                helperText={errors.remark?.message}
+              />
               <Button
                 type="submit"
                 fullWidth
