@@ -44,9 +44,9 @@ export default function DonationForm() {
     // -Remarks (optional)
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
+    alert({
       email: data.get("email"),
-      password: data.get("password"),
+      amount: data.get("amount"),
     });
   };
 
@@ -92,16 +92,14 @@ export default function DonationForm() {
               onSubmit={handleSubmit}
               sx={{ mt: 1 }}
             >
-              
               <TextField
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
+                id="amount"
+                label="Donation Amount"
+                name="amount"
+                type="number"
               />
               <TextField
                 margin="normal"
@@ -112,6 +110,61 @@ export default function DonationForm() {
                 name="name"
                 autoComplete="name"
               />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+              />
+              {/* <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="nirc"
+                label="ID Card Number"
+                name="nirc"
+                autoComplete="nirc"
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="postal"
+                label="Postal Code"
+                name="postal"
+                autoComplete="postal"
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="unit"
+                label="Unit Number"
+                name="unit"
+                autoComplete="unit"
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="address"
+                label="Address"
+                name="address"
+                autoComplete="address"
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="remark"
+                label="Remarks"
+                name="remark"
+                autoComplete="remark"
+              /> */}
               <Button
                 type="submit"
                 fullWidth
