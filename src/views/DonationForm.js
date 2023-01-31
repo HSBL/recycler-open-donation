@@ -46,6 +46,7 @@ export default function DonationForm() {
   // -Address (optional, but when filled can’t only use digit)
   // -Remarks (optional)
   const postalRegex = /\d{6}/g;
+  const addressRegex = /(?!^\d+$)^.+$/g;
   const unitRegex = /^([a-zA-Z0-9]*-[a-zA-Z0-9]*)+$/g;
 
   const schema = yup.object().shape({
@@ -71,7 +72,7 @@ export default function DonationForm() {
       .max(6)
       .matches(unitRegex, "Invalid Unit Number")
       .required(),
-    address: yup.string(),
+    address: yup.string().matches(addressRegex, "Invalid Address"),
     remark: yup.string(),
   });
   const {
@@ -83,17 +84,9 @@ export default function DonationForm() {
     resolver: yupResolver(schema),
   });
   const onSubmitHandler = (data) => {
-    alert({ data });
+    alert(`Thank you for SGD ${ data.amount } donation`);
     reset();
   };
-  // const handleSubmit = (event) => {
-  //   event.preventDefault();
-  //   const data = new FormData(event.currentTarget);
-  //   alert({
-  //     email: data.get("email"),
-  //     amount: data.get("amount"),
-  //   });
-  // };
 
   return (
     <ThemeProvider theme={theme}>
