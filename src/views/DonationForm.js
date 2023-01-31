@@ -13,6 +13,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import nricValidator from "./SingaporeNricValidator";
 
 function Copyright(props) {
   return (
@@ -44,13 +45,32 @@ export default function DonationForm() {
   // -Unit Number (max length 6 with hypen symbol is a must and also required)
   // -Address (optional, but when filled can’t only use digit)
   // -Remarks (optional)
+  const postalRegex = /\d{6}/g;
+  const unitRegex = /^([a-zA-Z0-9]*-[a-zA-Z0-9]*)+$/g;
+
   const schema = yup.object().shape({
     email: yup.string().email().required(),
     name: yup.string().min(2).max(128).required(),
-    amount: yup.number().required(),
-    nirc: yup.string().length(16).required(),
-    postal: yup.number().required(),
-    unit: yup.number().required(),
+    amount: yup.number().positive().required(),
+    nirc: yup
+      .string()
+      .test({
+        name: "is-nirc",
+        skipAbsent: true,
+        test(value, ctx) {
+          if (!nricValidator(value)) {
+            return ctx.createError({ message: "Invalid NIRC" });
+          }
+          return true;
+        },
+      })
+      .required(),
+    postal: yup.string().matches(postalRegex, "Invalid Postal Code").required(),
+    unit: yup
+      .string()
+      .max(6)
+      .matches(unitRegex, "Invalid Unit Number")
+      .required(),
     address: yup.string(),
     remark: yup.string(),
   });
@@ -186,7 +206,6 @@ export default function DonationForm() {
                 id="unit"
                 label="Unit Number"
                 name="unit"
-                type="number"
                 autoComplete="unit"
                 {...register("unit")}
                 error={!!errors.unit}
