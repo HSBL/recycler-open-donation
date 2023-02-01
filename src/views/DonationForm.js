@@ -7,13 +7,13 @@ import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import LockOutlinedIcon from "@mui/icons-material/RestoreFromTrashOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import nricValidator from "./SingaporeNricValidator";
+import logo from "../assets/img/give-love.png";
 
 function Copyright(props) {
   return (
@@ -36,18 +36,13 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function DonationForm() {
-  // FIELD:
-  // -Donation Amount (required)
-  // -Name (required)
-  // -Email (email format and required)
-  // -ID Number (NRIC validation and required)
-  // -Postal Code (6 digit format and required)
-  // -Unit Number (max length 6 with hypen symbol is a must and also required)
-  // -Address (optional, but when filled can’t only use digit)
-  // -Remarks (optional)
   const postalRegex = /\d{6}/g;
-  const addressRegex = /(?!^\d+$)^.+$/g;
+
   const unitRegex = /^([a-zA-Z0-9]*-[a-zA-Z0-9]*)+$/g;
+
+  function isNumeric(value) {
+    return /^-?\d+$/.test(value);
+  }
 
   const schema = yup.object().shape({
     email: yup.string().email().required(),
@@ -66,13 +61,26 @@ export default function DonationForm() {
         },
       })
       .required(),
-    postal: yup.string().matches(postalRegex, "Invalid Postal Code").required(),
+    postal: yup
+      .string()
+      .length(6)
+      .matches(postalRegex, "Invalid Postal Code")
+      .required(),
     unit: yup
       .string()
       .max(6)
-      .matches(unitRegex, "Invalid Unit Number")
+      .matches(unitRegex, '6 digit with hypen "-", hint: A-1234 ')
       .required(),
-    address: yup.string().matches(addressRegex, "Invalid Address"),
+    address: yup.string().test({
+      name: "is-address",
+      skipAbsent: true,
+      test(value, ctx) {
+        if (isNumeric(value)) {
+          return ctx.createError({ message: "Invalid Address" });
+        }
+        return true;
+      },
+    }),
     remark: yup.string(),
   });
   const {
@@ -84,7 +92,7 @@ export default function DonationForm() {
     resolver: yupResolver(schema),
   });
   const onSubmitHandler = (data) => {
-    alert(`Thank you for SGD ${ data.amount } donation`);
+    alert(`Thanks ${data.name}, for SGD ${data.amount} donation`);
     reset();
   };
 
@@ -118,9 +126,7 @@ export default function DonationForm() {
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
-            </Avatar>
+            <Avatar src={logo} sx={{ width: 100, height: 100 }}></Avatar>
             <Typography component="h1" variant="h5">
               Donate Yuk!
             </Typography>
